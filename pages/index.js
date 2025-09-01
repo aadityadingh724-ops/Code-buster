@@ -54,11 +54,11 @@ export default function Home() {
   };
 
   const sampleQuestions = [
-    "How to increase rice yield?",
-    "Best time to plant coconut?",
-    "Organic fertilizers for vegetables?",
-    "How to control pests naturally?",
-    "Soil preparation for pepper farming?"
+    translated.sampleQ1 || "How to increase rice yield?",
+    translated.sampleQ2 || "Best time to plant coconut?",
+    translated.sampleQ3 || "Organic fertilizers for vegetables?",
+    translated.sampleQ4 || "How to control pests naturally?",
+    translated.sampleQ5 || "Soil preparation for pepper farming?"
   ];
 
   useEffect(() => {
@@ -76,6 +76,7 @@ export default function Home() {
           heroTitle: "Kerala Farmers' AI Assistant",
           heroDesc: 'Get instant, intelligent farming advice powered by AI. Ask questions in your preferred language and receive personalized solutions for Kerala\'s unique agricultural conditions.',
           cta: 'Start Asking Questions →',
+          learnMore: 'Learn More',
           whyTitle: 'Why Choose Kera Farm Mitra?',
           whyDesc: 'Advanced AI technology meets traditional Kerala farming wisdom to provide you with the best agricultural guidance.',
           multiLang: 'Multi-Language Support',
@@ -89,7 +90,35 @@ export default function Home() {
           multiLangFeature: "Multi-language communication",
           built: 'Built for Kerala farmers with 💚 | Hackathon 2024',
           empower: 'Empowering agriculture through artificial intelligence',
-          copyright: '© 2024 Kera Farm Mitra. All rights reserved.'
+          copyright: '© 2024 Kera Farm Mitra. All rights reserved.',
+          
+          // Stats section
+          keralaDistricts: "Kerala Districts",
+          cropVarieties: "Crop Varieties", 
+          languages: "Languages",
+          
+          // Feature cards
+          aiPoweredTitle: "AI-Powered Intelligence",
+          aiPoweredDesc: "Advanced machine learning algorithms specifically trained on Kerala's agricultural patterns, providing intelligent solutions for local farming challenges from Wayanad to Kuttanad.",
+          keralaSpecificTitle: "Kerala-Specific Expertise",
+          keralaSpecificDesc: "Deep knowledge of spice cultivation, coconut farming, rice paddies, and traditional Kerala agriculture integrated with modern sustainable practices.",
+          multiLangDesc: "Communicate seamlessly in Malayalam, Hindi, Tamil, Telugu, and English - connecting Kerala's diverse farming communities through technology.",
+          
+          // Tech features
+          realTimeWeather: "Real-time weather integration",
+          marketPrices: "Market price updates",
+          
+          // Sample questions
+          sampleQ1: "How to increase rice yield?",
+          sampleQ2: "Best time to plant coconut?",
+          sampleQ3: "Organic fertilizers for vegetables?",
+          sampleQ4: "How to control pests naturally?",
+          sampleQ5: "Soil preparation for pepper farming?",
+          
+          // Form elements
+          questionPlaceholder: "Type your farming question here... (e.g., How to increase rice yield?)",
+          features: "Features",
+          askAI: "Ask AI"
         };
 
         const response = await fetch('/api/translate', {
@@ -198,14 +227,14 @@ export default function Home() {
                 onClick={() => scrollToSection('features')}
                 style={{ padding: '0.5rem', background: 'none', border: 'none', color: '#7cb342', fontSize: '0.9rem' }}
               >
-                Features
+                {translated.features || "Features"}
               </button>
               <button 
                 className="nav-button"
                 onClick={() => scrollToSection('ask-question')}
                 style={{ padding: '0.5rem', background: 'none', border: 'none', color: '#7cb342', fontSize: '0.9rem' }}
               >
-                Ask AI
+                {translated.askAI || "Ask AI"}
               </button>
             </div>
           )}
@@ -250,7 +279,7 @@ export default function Home() {
                     padding: isMobile ? '1rem 2rem' : '1.2rem 2.5rem'
                   }}
                 >
-                  Learn More
+                  {translated.learnMore || 'Learn More'}
                 </button>
               </div>
             </div>
@@ -258,15 +287,15 @@ export default function Home() {
             <div className="stats">
               <div className="stat-item">
                 <h3>14</h3>
-                <p>Kerala Districts</p>
+                <p>{translated.keralaDistricts || "Kerala Districts"}</p>
               </div>
               <div className="stat-item">
                 <h3>50+</h3>
-                <p>Crop Varieties</p>
+                <p>{translated.cropVarieties || "Crop Varieties"}</p>
               </div>
               <div className="stat-item">
                 <h3>5</h3>
-                <p>Languages</p>
+                <p>{translated.languages || "Languages"}</p>
               </div>
             </div>
           </div>
@@ -285,18 +314,18 @@ export default function Home() {
           <div className="features-grid">
             <div className="feature-card">
               <div className="feature-icon"><i className="fas fa-brain"></i></div>
-              <h3>AI-Powered Intelligence</h3>
-              <p>Advanced machine learning algorithms specifically trained on Kerala's agricultural patterns, providing intelligent solutions for local farming challenges from Wayanad to Kuttanad.</p>
+              <h3>{translated.aiPoweredTitle || "AI-Powered Intelligence"}</h3>
+              <p>{translated.aiPoweredDesc || "Advanced machine learning algorithms specifically trained on Kerala's agricultural patterns, providing intelligent solutions for local farming challenges from Wayanad to Kuttanad."}</p>
             </div>
             <div className="feature-card">
               <div className="feature-icon"><i className="fas fa-globe"></i></div>
               <h3>{translated.multiLang || 'Multi-Language Support'}</h3>
-              <p>Communicate seamlessly in Malayalam, Hindi, Tamil, Telugu, and English - connecting Kerala's diverse farming communities through technology.</p>
+              <p>{translated.multiLangDesc || "Communicate seamlessly in Malayalam, Hindi, Tamil, Telugu, and English - connecting Kerala's diverse farming communities through technology."}</p>
             </div>
             <div className="feature-card">
               <div className="feature-icon"><i className="fas fa-leaf"></i></div>
-              <h3>Kerala-Specific Expertise</h3>
-              <p>Deep knowledge of spice cultivation, coconut farming, rice paddies, and traditional Kerala agriculture integrated with modern sustainable practices.</p>
+              <h3>{translated.keralaSpecificTitle || "Kerala-Specific Expertise"}</h3>
+              <p>{translated.keralaSpecificDesc || "Deep knowledge of spice cultivation, coconut farming, rice paddies, and traditional Kerala agriculture integrated with modern sustainable practices."}</p>
             </div>
           </div>
         </section>
@@ -324,10 +353,15 @@ export default function Home() {
               <div className="input-group">
                 <input
                   type="text"
-                  placeholder="Type your farming question here... (e.g., How to increase rice yield?)"
+                  placeholder={translated.questionPlaceholder || "Type your farming question here... (e.g., How to increase rice yield?)"}
                   value={question}
                   onChange={e => setQuestion(e.target.value)}
-                  onKeyPress={e => { if (e.key === 'Enter') handleAsk(); }}
+                  onKeyDown={e => { 
+                    if (e.key === 'Enter' && !loading && question.trim()) {
+                      e.preventDefault();
+                      handleAsk();
+                    }
+                  }}
                   disabled={loading}
                 />
                 <button onClick={handleAsk} disabled={loading || !question.trim()}>
@@ -369,8 +403,8 @@ export default function Home() {
                 <li><i className="fas fa-check-circle"></i> {translated.cropGuidance || "Crop-specific guidance for Kerala's climate"}</li>
                 <li><i className="fas fa-check-circle"></i> {translated.support || "24/7 AI-powered support"}</li>
                 <li><i className="fas fa-check-circle"></i> {translated.multiLangFeature || "Multi-language communication"}</li>
-                <li><i className="fas fa-check-circle"></i> Real-time weather integration</li>
-                <li><i className="fas fa-check-circle"></i> Market price updates</li>
+                <li><i className="fas fa-check-circle"></i> {translated.realTimeWeather || "Real-time weather integration"}</li>
+                <li><i className="fas fa-check-circle"></i> {translated.marketPrices || "Market price updates"}</li>
               </ul>
             </div>
           </div>
