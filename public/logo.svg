@@ -1,0 +1,8 @@
+<!-- Placeholder SVG Logo for Kera Farm Mitra -->
+<svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="24" cy="24" r="24" fill="#388e3c"/>
+  <path d="M24 8 L32 16 L32 32 L24 40 L16 32 L16 16 Z" fill="#7cb342"/>
+  <circle cx="24" cy="20" r="4" fill="#fff"/>
+  <rect x="22" y="24" width="4" height="12" fill="#fff"/>
+  <path d="M18 28 L22 24 L26 24 L30 28" stroke="#fff" stroke-width="2" fill="none"/>
+</svg>
