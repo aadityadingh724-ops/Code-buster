@@ -3,8 +3,8 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
   
-  const { question } = req.body;
-  
+const { question, imageUrl, imageBase64 } = req.body;
+
   if (!question || typeof question !== 'string') {
     return res.status(400).json({ error: 'Please provide a valid farming question.' });
   }
@@ -29,49 +29,63 @@ export default async function handler(req, res) {
     
     Keep the response informative but concise (2-4 paragraphs). Focus on actionable advice that Kerala farmers can implement.`;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    const parts = [{ text: prompt }];
+
+      if (imageUrl) {
+        parts.push({
+          fileData: { mimeType: "image/jpeg", fileUri: imageUrl }
+        });
+      } else if (imageBase64) {
+        parts.push({
+          inlineData: { mimeType: "image/jpeg", data: imageBase64 }
+        });
+      }
+
+const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyBu6Ih3LOz00BHQeYuKAHfFW11aJowsPqk`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+      contents: [
+        {
+          parts: parts   // 👈 use the constructed array with text + image
+        }
+      ],
+    generationConfig: {
+      temperature: 0.7,
+      topK: 40,
+      topP: 0.95,
+      maxOutputTokens: 1024,
+    },
+    safetySettings: [
+      {
+        category: "HARM_CATEGORY_HARASSMENT",
+        threshold: "BLOCK_MEDIUM_AND_ABOVE"
       },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: prompt
-          }]
-        }],
-        generationConfig: {
-          temperature: 0.7,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 1024,
-        },
-        safetySettings: [
-          {
-            category: "HARM_CATEGORY_HARASSMENT",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
-          },
-          {
-            category: "HARM_CATEGORY_HATE_SPEECH",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
-          },
-          {
-            category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
-          },
-          {
-            category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
-          }
-        ]
-      })
-    });
+      {
+        category: "HARM_CATEGORY_HATE_SPEECH",
+        threshold: "BLOCK_MEDIUM_AND_ABOVE"
+      },
+      {
+        category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+        threshold: "BLOCK_MEDIUM_AND_ABOVE"
+      },
+      {
+        category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+        threshold: "BLOCK_MEDIUM_AND_ABOVE"
+      }
+    ]
+  })
+});
+
 
     if (!response.ok) {
       throw new Error(`Gemini API error: ${response.status}`);
     }
 
     const data = await response.json();
+    console.log("Gemini Response:", data);
     
     if (data.candidates && data.candidates[0] && data.candidates[0].content) {
       const answer = data.candidates[0].content.parts[0].text;

@@ -8,10 +8,13 @@ export default function Home() {
   const [answer, setAnswer] = useState('');
   const [loading, setLoading] = useState(false);
   const [language, setLanguage] = useState('en');
+  const [image, setImage] = useState(null); // store uploaded image
+  const [imageBase64, setImageBase64] = useState(null);
   const [translated, setTranslated] = useState({});
   const [translating, setTranslating] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [preview, setPreview] = useState(null); // preview URL
 
   // Check if device is mobile
   useEffect(() => {
@@ -174,15 +177,37 @@ export default function Home() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+
+    // Handle file input
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(file);
+
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        setPreview(reader.result); // for UI preview
+        // strip "data:image/xxx;base64," part before sending
+        const base64Data = reader.result.split(",")[1];
+        setImageBase64(base64Data);
+      };
+
+      reader.readAsDataURL(file);
+    }
+  };
+
+
   const handleAsk = async () => {
     if (!question.trim()) return;
     setLoading(true);
     setAnswer('');
+    
     try {
       const res = await fetch('/api/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question }),
+        body: JSON.stringify({ question, imageBase64 }),
       });
       const data = await res.json();
       setAnswer(data.answer);
@@ -191,12 +216,14 @@ export default function Home() {
     }
     setLoading(false);
     setQuestion('');
+    setImage(null);
+    setPreview(null);
   };
 
   return (
     <>
       <Head>
-        <title>Kera Farm Mitra - AI Assistant for Kerala Farmers</title>
+        <title>Kerala Farm Mitra - AI Assistant for Kerala Farmers</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
         <link rel="stylesheet" href="/styles/kerala-modern.css" />
@@ -214,7 +241,7 @@ export default function Home() {
           <div className="logo" onClick={() => scrollToSection('home')} style={{ cursor: 'pointer' }}>
             <img src="/kerala-logo.svg" alt="Kera Farm Mitra" />
             <div>
-              <h1>Kera <span>Farm</span></h1>
+              <h1>Kerala <span>Farm</span></h1>
               <h2>Mitra</h2>
             </div>
           </div>
@@ -337,6 +364,7 @@ export default function Home() {
         <section id="ask-question" className="question-section">
           <div className="question-container">
             <div className="question-box">
+
               <div className="section-header">
                 <h2 className="section-title">{translated.askTitle || 'Ask Your Farming Question'}</h2>
                 <p className="section-subtitle">{translated.askDesc || 'Our AI assistant is ready to help you with any agriculture-related query'}</p>
@@ -364,11 +392,26 @@ export default function Home() {
                   }}
                   disabled={loading}
                 />
+
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  style={{ marginLeft: '10px', width: '12px' }}
+                />
+
                 <button onClick={handleAsk} disabled={loading || !question.trim()}>
                   {loading ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-paper-plane"></i>}
                 </button>
               </div>
               
+              {preview && (
+                <div className="image-preview">
+                  <p>Image selected:</p>
+                  <img src={preview} alt="preview" style={{ maxWidth: '200px', marginTop: '10px' }} />
+                </div>
+              )}
+
               {answer && (
                 <div className="answer-box">
                   <strong>{translated.aiAnswer || 'AI Answer:'}</strong> {answer}
@@ -443,7 +486,7 @@ export default function Home() {
 
       <footer>
         <div className="footer-content">
-          <div className="footer-logo">Kera Farm Mitra</div>
+          <div className="footer-logo">Kerala Farm Mitra</div>
           <p className="footer-text">{translated.built || 'Built with 💚 for God\'s Own Country | Empowering Kerala Farmers 2024'}</p>
           <p className="footer-text">{translated.empower || 'From Malabar\'s spice gardens to Kuttanad\'s rice fields - AI for sustainable agriculture'}</p>
           <div className="copyright">
